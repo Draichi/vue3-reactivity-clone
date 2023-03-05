@@ -1,20 +1,54 @@
-let price = 1;
-let quantity = 3;
 let total = 0;
 
-const dep = new Set();
+const product = { price: 1, quantity: 3 };
 
+/**
+ * A dependency which is a set of effects that should get re-run when values change
+ */
+const dep: Set<Function> = new Set();
+
+/**
+ * A map where we store the dependency object for each property
+ */
+const depsMap: Map<string, Set<Function>> = new Map();
+
+/**
+ * Where we store the dependencies associated with each reactive object's properties
+ */
+const targetMap = new WeakMap();
+
+/**
+ * The code we want to save
+ */
 const effect = () => {
-  total = price * quantity;
+  total = product.price * product.quantity;
 };
 
-function track() {
+/**
+ * Save the code we have inside the `effect`
+ */
+function track(key: string) {
+  let dep = depsMap.get(key);
+
+  if (!dep) {
+    depsMap.set(key, (dep = new Set()));
+  }
+
   dep.add(effect);
 }
 
-const trigger = () => {
-  dep.forEach((eff: any) => eff());
+/**
+ * Run all the saved code
+ */
+const trigger = (key: string) => {
+  let dep = depsMap.get(key);
+
+  if (!dep) {
+    return;
+  }
+
+  dep.forEach((effect) => effect());
 };
 
-track();
+track("quantity");
 effect();
