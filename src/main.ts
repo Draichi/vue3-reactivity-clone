@@ -27,7 +27,13 @@ const effect = () => {
 /**
  * Save the code we have inside the `effect`
  */
-function track(key: string) {
+function track(target: object, key: string) {
+  let depsMap = targetMap.get(target);
+
+  if (!depsMap) {
+    targetMap.set(target, (depsMap = new Map()));
+  }
+
   let dep = depsMap.get(key);
 
   if (!dep) {
@@ -40,7 +46,13 @@ function track(key: string) {
 /**
  * Run all the saved code
  */
-const trigger = (key: string) => {
+const trigger = (target: object, key: string) => {
+  const depsMap = targetMap.get(target);
+
+  if (!depsMap) {
+    return;
+  }
+
   let dep = depsMap.get(key);
 
   if (!dep) {
@@ -50,5 +62,5 @@ const trigger = (key: string) => {
   dep.forEach((effect) => effect());
 };
 
-track("quantity");
+track(product, "quantity");
 effect();
