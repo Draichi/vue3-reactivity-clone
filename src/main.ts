@@ -1,6 +1,6 @@
 let total = 0;
 
-const product = { price: 1, quantity: 3 };
+let product = reactive({ price: 1, quantity: 3 });
 
 /**
  * A dependency which is a set of effects that should get re-run when values change
@@ -27,7 +27,7 @@ const effect = () => {
 /**
  * Save the code we have inside the `effect`
  */
-function track(target: object, key: string) {
+function track(target: object, key: string | symbol) {
   let depsMap = targetMap.get(target);
 
   if (!depsMap) {
@@ -46,7 +46,7 @@ function track(target: object, key: string) {
 /**
  * Run all the saved code
  */
-const trigger = (target: object, key: string) => {
+const trigger = (target: object, key: string | symbol) => {
   const depsMap = targetMap.get(target);
 
   if (!depsMap) {
@@ -62,5 +62,28 @@ const trigger = (target: object, key: string) => {
   dep.forEach((effect) => effect());
 };
 
-track(product, "quantity");
+/**
+ * Gets an object, creates a reactive proxy of that object, and returns that proxy.
+ * @param target an object to make it reactive
+ * @returns a reactive proxy of the target object
+ */
+function reactive<T>(target: T): T {
+  const handler: ProxyHandler<object> = {
+    get(target, key, receiver) {
+      track(target, key);
+      return Reflect.get(target, key, receiver);
+    },
+
+    set(target, key, value, receiver) {
+      let oldValue = target[key];
+      let result = Reflect.set(target, key, value, receiver);
+      if (result && oldValue !== value) {
+        trigger(target, key);
+      }
+      return result;
+    },
+  };
+  return new Proxy(target as object, handler) as T;
+}
+
 effect();
