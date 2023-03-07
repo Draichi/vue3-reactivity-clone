@@ -1,5 +1,6 @@
 let total = 0;
-
+let salePrice = ref(0);
+let activeEffect = null;
 let product = reactive({ price: 1, quantity: 3 });
 
 /**
@@ -20,14 +21,20 @@ const targetMap = new WeakMap();
 /**
  * The code we want to save
  */
-const effect = () => {
-  total = product.price * product.quantity;
-};
+function effect(eff: Function) {
+  activeEffect = eff;
+  activeEffect();
+  activeEffect = null;
+}
 
 /**
  * Save the code we have inside the `effect`
  */
 function track(target: object, key: string | symbol) {
+  if (!activeEffect) {
+    return;
+  }
+
   let depsMap = targetMap.get(target);
 
   if (!depsMap) {
@@ -40,7 +47,7 @@ function track(target: object, key: string | symbol) {
     depsMap.set(key, (dep = new Set()));
   }
 
-  dep.add(effect);
+  dep.add(activeEffect);
 }
 
 /**
@@ -86,4 +93,24 @@ function reactive<T>(target: T): T {
   return new Proxy(target as object, handler) as T;
 }
 
-effect();
+function ref<T>(raw: T) {
+  const r = {
+    get value() {
+      track(r, "value");
+      return raw;
+    },
+    set value(newValue) {
+      raw = newValue;
+      trigger(r, "value");
+    },
+  };
+  return r;
+}
+
+effect(() => {
+  total = product.quantity * salePrice.value;
+});
+
+effect(() => {
+  salePrice.value = product.price * 0.9;
+});
