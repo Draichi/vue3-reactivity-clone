@@ -1,7 +1,7 @@
-let total = 0;
-let salePrice = ref(0);
+/**
+ * The user effect that is currently active
+ */
 let activeEffect = null;
-let product = reactive({ price: 1, quantity: 3 });
 
 /**
  * A dependency which is a set of effects that should get re-run when values change
@@ -93,7 +93,12 @@ function reactive<T>(target: T): T {
   return new Proxy(target as object, handler) as T;
 }
 
-function ref<T>(raw: T) {
+/**
+ * Gets a primitive value and returns a reactive object based on that value
+ * @param raw A primitive value
+ * @returns A reactive object
+ */
+function ref<T>(raw?: T) {
   const r = {
     get value() {
       track(r, "value");
@@ -107,10 +112,26 @@ function ref<T>(raw: T) {
   return r;
 }
 
-effect(() => {
-  total = product.quantity * salePrice.value;
+/**
+ * Creates a reactive reference called `result`, run the getter in a `effect`
+ * which sets the `result.value` and then returns the result
+ * @param getter A function that gets a value
+ */
+function computed(getter: Function) {
+  let result = ref();
+
+  effect(() => (result.value = getter()));
+
+  return result;
+}
+
+// Using the Vue 3 functions:
+
+let product = reactive({ price: 1, quantity: 3 });
+let salePrice = computed(() => {
+  return product.price * 0.9;
 });
 
-effect(() => {
-  salePrice.value = product.price * 0.9;
+let total = computed(() => {
+  return +salePrice.value * product.quantity;
 });
