@@ -2,11 +2,7 @@
   "name": "vue3-reactivity-clone",
   "private": true,
   "version": "1.0.0",
-  "scripts": {
-    "debug": "echo \"Error: use the integrated Run and Debug panel on VSCode\" && exit 1"
-  },
-  "devDependencies": {
-    "@types/node": "^18.14.6",
-    "typescript": "^4.9.3"
-  }
+  "type": "module",
+  "main": "index.js",
+  "devDependencies": {}
 }

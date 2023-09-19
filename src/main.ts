@@ -1,27 +1,20 @@
 /**
  * The user effect that is currently active
  */
-let activeEffect = null;
-
-/**
- * A dependency which is a set of effects that should get re-run when values change
- */
-const dep: Set<Function> = new Set();
-
-/**
- * A map where we store the dependency object for each property
- */
-const depsMap: Map<string, Set<Function>> = new Map();
+let activeEffect: Function | null = null;
 
 /**
  * Where we store the dependencies associated with each reactive object's properties
  */
-const targetMap = new WeakMap();
+const targetMap: WeakMap<
+  Object,
+  Map<string | symbol, Set<Function>>
+> = new WeakMap();
 
 /**
  * The code we want to save
  */
-function effect(eff: Function) {
+function effect(eff: () => void) {
   activeEffect = eff;
   activeEffect();
   activeEffect = null;
@@ -74,7 +67,7 @@ const trigger = (target: object, key: string | symbol) => {
  * @param target an object to make it reactive
  * @returns a reactive proxy of the target object
  */
-function reactive<T>(target: T): T {
+export function reactive<T>(target: T): T {
   const handler: ProxyHandler<object> = {
     get(target, key, receiver) {
       track(target, key);
@@ -98,11 +91,11 @@ function reactive<T>(target: T): T {
  * @param raw A primitive value
  * @returns A reactive object
  */
-function ref<T>(raw?: T) {
+export function ref<T>(raw?: T): { value: T } {
   const r = {
     get value() {
       track(r, "value");
-      return raw;
+      return raw || (null as T);
     },
     set value(newValue) {
       raw = newValue;
@@ -117,21 +110,10 @@ function ref<T>(raw?: T) {
  * which sets the `result.value` and then returns the result
  * @param getter A function that gets a value
  */
-function computed(getter: Function) {
+export function computed(getter: () => void) {
   let result = ref();
 
   effect(() => (result.value = getter()));
 
   return result;
 }
-
-// Using the Vue 3 functions:
-
-let product = reactive({ price: 1, quantity: 3 });
-let salePrice = computed(() => {
-  return product.price * 0.9;
-});
-
-let total = computed(() => {
-  return +salePrice.value * product.quantity;
-});
