@@ -4,5 +4,5 @@
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
-  "devDependencies": {}
+  "devDependencies": { "bun-types": "^1.0.3" }
 }

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "target": "ES2022",
+    "paths": {
+      "@vue-clone": ["./src/main.ts"]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  // If support for Bun should be added to the default "JavaScript Debug Terminal".
+  "bun.debugTerminal.enabled": true,
+
+  // If the debugger should stop on the first line of the program.
+  "bun.debugTerminal.stopOnEntry": false,
+  /*
+      Editor
+    */
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.tabSize": 2,
+  "editor.fontLigatures": true,
+  "editor.cursorWidth": 0,
+  "editor.rulers": [80, 120],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "editor.minimap.enabled": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.minimap.renderCharacters": false,
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.semanticHighlighting.enabled": false,
+  "editor.suggestSelection": "first",
+  "editor.links": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": [
+    "source.formatDocument",
+    "source.fixAll.eslint",
+    "source.fixAll.stylelint"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  /*
+      Prettier
+    */
+  "prettier.enable": true,
+  "prettier.requireConfig": true
+}
