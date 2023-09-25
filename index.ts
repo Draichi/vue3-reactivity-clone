@@ -1,4 +1,4 @@
-import { ref, computed } from "./src/main";
+import { ref, computed } from '@vue-clone';
 
 const count = ref(0);
 
